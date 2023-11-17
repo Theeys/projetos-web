@@ -9,6 +9,22 @@
     const btnSwitchWebcam = document.querySelector('.btn-switch-webcam')   
     const btnSwitchPaleta = document.querySelector('.btn-switch-paleta')
 
+    function calcularTamanhoCanvas() {
+        if(screen.width < 572){
+            canvas.width = 35
+            canvasTxtVideo.width = 350
+        } else if(screen.width < 800){
+            canvas.width = 50
+            canvasTxtVideo.width = 500
+        } else {
+            canvas.width = 80
+            canvasTxtVideo.width = 800        
+        }
+    }
+
+    window.addEventListener('resize', calcularTamanhoCanvas)
+    calcularTamanhoCanvas()
+
     ctxTxtVideo.font = `12px monospace`
     ctxTxtVideo.imageSmoothingEnabled = !0
     ctxTxtVideo.fontKerning = "none"
@@ -147,3 +163,4 @@
         gradient = ASCII_PALETTES[optionGradient].split('').reverse().join('');        
     })
 })()
+

@@ -9,10 +9,6 @@ body {
     font-size: 25px;
 }
 
-.canvas-video {
-    display: none;
-}    
-
 .btn-switch-video {
     font-size: 30px;
 }
@@ -42,4 +38,14 @@ body {
 .wrapper video {
     border-radius: 8%;
     height: 180px    
+}
+
+.canvas-video {
+    display: none;
+}
+
+@media (max-width: 572px) {
+    .espaco-extra {
+        height: 300px;
+    }
 }
