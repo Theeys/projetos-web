@@ -1,0 +1,14 @@
+body {
+    background: #000000
+}
+
+video, canvas {
+    /* display: none; */
+}
+
+#text-video {
+    font-family: Courier,serif;
+    font-size: 6px;
+    line-height: 4px;
+    color: white;
+}

@@ -1,0 +1,45 @@
+body {
+    background: #000000;
+    padding: 10px 0px 0px 0px;
+}
+
+.controle-video a{
+    text-decoration: none;        
+    color: papayawhip;
+    font-size: 25px;
+}
+
+.canvas-video {
+    display: none;
+}    
+
+.btn-switch-video {
+    font-size: 30px;
+}
+
+.center {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    text-align: center;   
+}
+
+.wrapper {
+    display: block;
+    z-index: 5;
+    position: fixed;
+    bottom: 15px;
+    left: 20px;
+    width: auto;
+    background: transparent;
+    border-radius: 8%;
+    transition: right 0.3s ease;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+}
+
+.wrapper video {
+    border-radius: 8%;
+    height: 180px    
+}
