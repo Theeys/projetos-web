@@ -6,7 +6,8 @@
     const ctxTxtVideo = canvasTxtVideo.getContext('2d');
     const btnSwitchColor = document.querySelector('.btn-switch-color-video')
     const btnSwitchTextVideo = document.querySelector('.btn-switch-video')        
-    const btnSwitchWebcam = document.querySelector('.btn-switch-webcam')        
+    const btnSwitchWebcam = document.querySelector('.btn-switch-webcam')   
+    const btnSwitchPaleta = document.querySelector('.btn-switch-paleta')
 
     ctxTxtVideo.font = `12px monospace`
     ctxTxtVideo.imageSmoothingEnabled = !0
@@ -31,8 +32,8 @@
                             alphanumeric: "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890abcdefghijklmnopqrstuvwxyz",
                             default: "\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0++++++++########"
                         };
-
-    const gradient = ASCII_PALETTES["mediumset"].split('').reverse().join('');
+    let optionGradient = "mediumset"
+    let gradient = ASCII_PALETTES[optionGradient].split('').reverse().join('');
 
     const init = () => {
         navigator.mediaDevices.getUserMedia({ video: true, audio: false })
@@ -139,4 +140,11 @@
         }            
     })
 
+    btnSwitchPaleta.addEventListener('click', (e) => {
+        const chaves = Object.keys(ASCII_PALETTES);
+        let index = chaves.indexOf(optionGradient)
+        index = index < (chaves.length-1)? index+1 : 0
+        optionGradient = chaves[index]
+        gradient = ASCII_PALETTES[optionGradient].split('').reverse().join('');        
+    })
 })()
