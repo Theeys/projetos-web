@@ -6,7 +6,7 @@ export class EntityWithBoxCollision extends Entity {
         this.boxCollision = {
             pos: [this.pos[0] - this.size, this.pos[1] - this.size],
             size: [this.size, this.size],
-            show: true,
+            show: entityProps.debug?? false,
         }
     }
 

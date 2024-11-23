@@ -2,13 +2,14 @@ import { SpaceShip } from "./entitys/spaceship.js"
 import { Asteroid } from "./entitys/asteroid.js"
 import { Star } from "./entitys/star.js"
 import { Projetil } from "./entitys/projetil.js"
-
+import { EntityWithBoxCollision } from "./entitys/entity-with-collision.js"
 export class Game {
     constructor(canvas) {
         this.canvas = canvas
         this.ctx = canvas.getContext("2d")
         this.entitys = []
         this.over = false
+        this.debug = false
         this.entitys.push(
             this.createSpaceShip(canvas.width / 2, canvas.height - 10)
         )
@@ -22,6 +23,15 @@ export class Game {
         }
     }
 
+    switchDebug() {
+        this.debug = !this.debug
+        this.entitys
+            .filter((entity) => entity instanceof EntityWithBoxCollision)
+            .forEach((entity) => {
+                entity.boxCollision.show = this.debug
+            })
+    }
+
     getSpaceShips() {
         return this.entitys.filter((entity) => entity instanceof SpaceShip)
     }
@@ -31,6 +41,7 @@ export class Game {
             pos: [x, y],
             color: "orange",
             speed: [0, -10],
+            debug: this.debug,
         })
         this.entitys.push(projetil)
     }
@@ -62,6 +73,7 @@ export class Game {
             ],
             size: [20, 10],
             color: "white",
+            debug: this.debug,
         })
         asteroid.pos[1] = y - asteroid.size
         return asteroid
