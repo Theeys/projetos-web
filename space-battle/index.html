@@ -20,10 +20,29 @@
                 filter: drop-shadow(0 0 10px darkviolet);
                 cursor: none;
             }
+            div {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+            button {
+                background-color: darkviolet;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 5px;
+                cursor: pointer;
+                margin-bottom: 25px;
+                font-size: 1em;
+                font-weight: bold;
+            }
         </style>
     </head>
     <body>
-        <canvas id="canvas"></canvas>
+        <div>
+            <button id="fullscreen">Tela Cheia</button>
+            <canvas id="canvas"></canvas>
+        </div>
         <script type="module" src="script.js"></script>
     </body>
 </html>

@@ -4,6 +4,8 @@ import { Game } from "./game.js"
 const canvas = document.getElementById("canvas")
 const ctx = canvas.getContext("2d")
 
+const btnFullscreen = document.getElementById("fullscreen")
+
 export { canvas, ctx }
 
 function animate() {
@@ -32,6 +34,16 @@ const fireHandler = () => {
     game.createProjetil(spaceShip.pos[0], spaceShip.pos[1])
     if (game.over) game = new Game(canvas)
 }
+
+btnFullscreen.addEventListener("click", () => {
+    if (canvas.requestFullscreen) {
+        canvas.requestFullscreen();
+    } else if (canvas.webkitRequestFullscreen) {
+        canvas.webkitRequestFullscreen();
+    } else if (canvas.msRequestFullscreen) {
+        canvas.msRequestFullscreen();
+    }
+})
 
 canvas.addEventListener("click", fireHandler)
 canvas.addEventListener("touchstart", fireHandler)
