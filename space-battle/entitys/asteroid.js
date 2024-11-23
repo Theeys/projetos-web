@@ -15,7 +15,6 @@ export class Asteroid extends EntityWithBoxCollision {
         // ctx.stroke();
         ctx.beginPath()
         const points = 5
-        const irregularity = 0.4
         for (let i = 0; i < points; i++) {
             // Ângulo para cada ponto
             const angle = (i / points) * Math.PI * 2

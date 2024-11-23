@@ -1,6 +1,4 @@
-import { SpaceShip } from "./entitys/spaceship.js"
 import { Star } from "./entitys/star.js"
-import { EntityWithBoxCollision } from "./entitys/entity-with-collision.js"
 import { Game } from "./game.js"
 
 const canvas = document.getElementById("canvas")
@@ -26,10 +24,12 @@ function handlerResizeWindow() {
         canvas.height = window.innerHeight
     }
 
-    game.entitys.filter((entity) => entity instanceof Star).forEach((entity) => {
-        entity.pos[0] = Math.random() * canvas.width
-        entity.pos[1] = Math.random() * canvas.height
-    })
+    game.entitys
+        .filter((entity) => entity instanceof Star)
+        .forEach((entity) => {
+            entity.pos[0] = Math.random() * canvas.width
+            entity.pos[1] = Math.random() * canvas.height
+        })
 }
 
 function isFullscreen() {
@@ -38,16 +38,22 @@ function isFullscreen() {
 
 let game = new Game(canvas)
 
+const music = new Audio("./assets/audio/8-bit-loop.mp3")
+music.loop = true
+music.volume = 0.4
+
 window.addEventListener("resize", handlerResizeWindow)
 handlerResizeWindow()
 
 const fireHandler = () => {
     const spaceShip = game.getSpaceShips()[0]
-    game.createProjetil(spaceShip.pos[0], spaceShip.pos[1])
-    if (!game.over) return
-    const debug = game.debug
-    game = new Game(canvas)
-    if (debug) game.switchDebug()
+    if (spaceShip) {
+        game.createProjetil(spaceShip.pos[0], spaceShip.pos[1])
+        return
+    }
+    if (game.start) return
+    game.startGame()
+    music.play()
 }
 
 btnFullscreen.addEventListener("click", () => {

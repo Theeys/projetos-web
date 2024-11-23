@@ -8,11 +8,8 @@ export class Game {
         this.canvas = canvas
         this.ctx = canvas.getContext("2d")
         this.entitys = []
-        this.over = false
+        this.start = false
         this.debug = false
-        this.entitys.push(
-            this.createSpaceShip(canvas.width / 2, canvas.height - 10)
-        )
         for (let i = 0; i < 20; i++) {
             this.entitys.push(
                 this.createStar(
@@ -21,6 +18,23 @@ export class Game {
                 )
             )
         }
+    }
+
+    startGame() {
+        this.start = true
+        this.entitys.push(
+            this.createSpaceShip(this.canvas.width / 2, this.canvas.height - 10)
+        )
+        this.entitys = this.entitys.filter(
+            (entity) => !(entity instanceof Asteroid)
+        )
+    }
+
+    gameOver() {
+        this.start = false
+        this.entitys = this.entitys.filter(
+            (entity) => !(entity instanceof SpaceShip)
+        )
     }
 
     switchDebug() {
@@ -44,6 +58,9 @@ export class Game {
             debug: this.debug,
         })
         this.entitys.push(projetil)
+        const fireSound = new Audio("./assets/audio/8-bit-laser.mp3")
+        fireSound.volume = 0.8
+        fireSound.play()
     }
 
     createSpaceShip(x, y) {
@@ -80,7 +97,6 @@ export class Game {
     }
 
     updateAndDraw() {
-        if (this.over) return
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
 
         this.entitys.forEach((entity) => {
@@ -98,6 +114,21 @@ export class Game {
         if (Math.random() > 0.98 && asteroids.length < 8) {
             this.entitys.push(
                 this.createAsteroid(Math.random() * this.canvas.width, 0)
+            )
+        }
+
+        if (!this.start) {
+            const amplitude = 10
+            const frequency = 0.002
+            const bounceOffset = Math.sin(Date.now() * frequency) * amplitude
+
+            this.ctx.fillStyle = "white"
+            this.ctx.font = "bold 50px Arial"
+            this.ctx.textAlign = "center"
+            this.ctx.fillText(
+                "Iniciar jogo",
+                this.canvas.width / 2 + bounceOffset,
+                this.canvas.height / 2 + bounceOffset
             )
         }
     }

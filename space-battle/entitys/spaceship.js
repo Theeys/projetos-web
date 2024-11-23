@@ -65,7 +65,7 @@ export class SpaceShip extends EntityWithBoxCollision {
 
         asteroids.forEach((asteroid) => {
             const isCollided = this.isCollided(asteroid.boxCollision)
-            if (isCollided) game.over = true
+            if (isCollided) game.gameOver()
         })
 
         this.spaceShipShape = [
