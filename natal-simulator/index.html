@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+        <style>
+            body {
+                background-color: black;
+                margin: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                height: 100vh;
+                width: 100vw;
+            }
+
+            canvas {
+                background-color: black;
+                border-radius: 10px;
+                border: 1px solid darkviolet;
+                filter: drop-shadow(0 0 10px darkviolet);
+            }
+        </style>
+    </head>
+    <body>
+        <canvas id="canvas"></canvas>
+        <script>
+            const canvas = document.getElementById("canvas")
+            const ctx = canvas.getContext("2d")
+
+            canvas.width = window.innerWidth * 0.8
+            canvas.height = window.innerHeight * 0.8
+            const snowflakes = []
+            const trees = []
+            const clouds = []
+
+            function randomColor() {
+                return `rgb(${Math.random() * 255}, ${Math.random() * 255}, ${
+                    Math.random() * 255
+                })`
+            }
+
+            function drawPixel(pixel) {
+                ctx.save()
+                ctx.fillStyle = pixel.color
+                ctx.fillRect(
+                    pixel.coord[0],
+                    pixel.coord[1],
+                    pixel.size[0],
+                    pixel.size[1]
+                )
+                ctx.restore()
+            }
+
+            function renderSnow() {
+                for (const pixel of snowflakes) {
+                    for (let i = 0; i < pixel.speed.length; i++) {
+                        const speed = pixel.speed[i]
+                        pixel.coord[i] += speed
+                    }
+
+                    const limits = [canvas.width, canvas.height]
+                    for (let i = 0; i < pixel.coord.length; i++) {
+                        if (pixel.coord[i] > limits[i]) {
+                            pixel.coord[i] = 0
+                        } else if (pixel.coord[i] < 0) {
+                            pixel.coord[i] = limits[i]
+                        }
+                    }
+
+                    drawPixel(pixel)
+                }
+            }
+
+            function renderTree() {
+                for (const tree of trees) {
+                    ctx.save()
+                    ctx.fillStyle = tree.color
+                    ctx.fillRect(
+                        tree.coord[0],
+                        tree.coord[1],
+                        tree.size[0],
+                        tree.size[1]
+                    )
+                    ctx.strokeStyle = "black"
+                    ctx.lineWidth = 0.1
+                    ctx.strokeRect(
+                        tree.coord[0],
+                        tree.coord[1],
+                        tree.size[0],
+                        tree.size[1]
+                    )
+                    ctx.restore()
+                }
+            }
+            let index = 0
+            let lastTime = 0
+            function renderMoon(timestamp) {
+                ctx.save()
+                const values = [
+                    4, 4.25, 4.5, 4.75, 5, 5.25, 5.5, 5.75, 6, 5.75, 5.5, 5.25,
+                    5, 4.75, 4.5, 4.25, 4,
+                ]
+                if (timestamp - lastTime >= 200) {
+                    index = (index + 1) % values.length
+                    lastTime = timestamp
+                }
+                ctx.filter = `blur(${values[index] - 2.5}px) brightness(${
+                    values[index] * 15
+                }%)`
+                ctx.fillStyle = "#c1d2e8"
+                ctx.beginPath()
+                ctx.arc(120, 100, 25, 0, Math.PI * 2)
+                ctx.fill()
+                ctx.restore()
+            }
+
+            const floor = []
+            const maxSize = 30
+            for (let i = 0; i < 100; i++) {
+                floor.push({
+                    startSize: (canvas.width - maxSize) * Math.random(),
+                    lineWidth: 10 * Math.random() + 10,
+                })
+            }
+
+            function renderFloor() {
+                ctx.save()
+                ctx.beginPath()
+                ctx.moveTo(0, canvas.height)
+                ctx.lineTo(canvas.width, canvas.height)
+                ctx.lineWidth = 15
+                ctx.strokeStyle = "#bababa"
+                ctx.stroke()
+                ctx.restore()
+
+                for (let i = 0; i < 100; i++) {
+                    ctx.save()
+                    ctx.beginPath()
+                    const startSize = floor[i].startSize
+                    ctx.moveTo(startSize, canvas.height)
+                    ctx.lineTo(startSize + maxSize, canvas.height)
+                    ctx.lineWidth = floor[i].lineWidth
+                    ctx.strokeStyle = "#bababa"
+                    ctx.stroke()
+                    ctx.restore()
+                }
+            }
+
+            function renderClouds() {
+                for (const cloud of clouds) {
+                    for (let i = 0; i < cloud.coord.length; i++) {
+                        cloud.coord[i] += cloud.speed[i]
+                        const limits = [canvas.width / 3, canvas.height]
+                        if (cloud.coord[i] > limits[i] || cloud.coord[i] < 0) {
+                            cloud.speed[i] = -cloud.speed[i]
+                        }
+                    }
+
+                    ctx.save()
+                    ctx.filter = "blur(10px)"
+                    ctx.fillStyle = cloud.color
+                    ctx.beginPath()
+                    ctx.arc(
+                        cloud.coord[0],
+                        cloud.coord[1],
+                        cloud.size,
+                        0,
+                        Math.PI * 2
+                    )
+                    ctx.fill()
+                    ctx.restore()
+                }
+            }
+
+            function animate(timestamp) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height)
+                renderMoon(timestamp)
+                renderClouds()
+                renderSnow()
+                renderTree()
+                renderFloor()
+                requestAnimationFrame(animate)
+            }
+
+            function generateSnowflakes() {
+                const limitSize = 2
+                const limitSpeed = 3
+                for (let i = 0; i < 400; i++) {
+                    snowflakes.push({
+                        coord: [
+                            Math.random() * canvas.width,
+                            Math.random() * canvas.height,
+                        ],
+                        size: [
+                            Math.random() * limitSize,
+                            Math.random() * limitSize,
+                        ],
+                        color: "white",
+                        speed: [
+                            Math.random() * limitSpeed,
+                            Math.random() * limitSpeed,
+                        ],
+                    })
+                }
+            }
+
+            function generateTree() {
+                const tree = []
+
+                const createTree = () => {
+                    const coordX = Math.random() * canvas.width
+                    const size = [
+                        (Math.random() * 4 + 4) * 2,
+                        Math.random() * 15 + 30,
+                    ]
+                    const coord = [coordX, canvas.height - size[1]]
+                    return {
+                        coord,
+                        size,
+                        color: "#4f4245",
+                    }
+                }
+
+                const createLeave = (tree, index) => {
+                    const size = [55 - index * 10, 8]
+                    const coord = [
+                        tree.coord[0] + tree.size[0] / 2 - size[0] / 2,
+                        tree.coord[1] - size[1] * index,
+                    ]
+                    return {
+                        coord,
+                        size,
+                        color: "#97ad9b",
+                    }
+                }
+
+                for (let i = 0; i < 45; i++) {
+                    const tree = createTree()
+                    trees.push(tree)
+                    for (let j = 0; j < 6; j++) {
+                        const leaves = createLeave(tree, j)
+                        trees.push(leaves)
+                    }
+                }
+
+                trees.push(...tree)
+            }
+
+            function generateClouds() {
+                for (let i = 0; i < 15; i++) {
+                    clouds.push({
+                        coord: [(Math.random() * canvas.width) / 3, 116],
+                        speed: [Math.random() * 0.5 - 0.25, 0],
+                        size: 23,
+                        color: "#0d0d0d",
+                    })
+                }
+            }
+
+            generateSnowflakes()
+            generateTree()
+            generateClouds()
+            animate()
+        </script>
+    </body>
+</html>

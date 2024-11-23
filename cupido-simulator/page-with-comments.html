@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Biscoito</title>
+        <style>
+            body {
+                background: black;
+                margin: 0;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                width: 100vw;
+                height: 100vh;
+            }
+            canvas {
+                border-radius: 20px;
+                background: black;
+                filter: drop-shadow(0 0 10px darkviolet);
+            }
+        </style>
+    </head>
+    <body>
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+
+        <script>
+            // Obter o canvas e o contexto
+            var canvas = document.getElementById("gameCanvas")
+            var ctx = canvas.getContext("2d")
+
+            // Propriedades do coração
+            var heart = {
+                x: canvas.width / 2,
+                y: canvas.height / 2,
+                radius: 30,
+                hits: 0,
+                maxHits: 24,
+                alive: true,
+                shakeTime: 0,
+                shakeDuration: 10,
+                pieces: [],
+                isBreaking: false,
+                breakAnimationDuration: 60, // Duração da animação em frames
+                breakAnimationTime: 0,
+            }
+
+            // Lista de flechas
+            var flechas = []
+
+            // Lista de pontos para exibir quando a flecha acerta o coração
+            var pontos = []
+
+            // Contagem de pontos
+            var score = 0
+
+            // Propriedades do arco
+            var bow = {
+                x: 0,
+                y: 0,
+                armed: false,
+            }
+
+            // Função para desenhar o coração
+            function drawHeart(x, y, size) {
+                ctx.save()
+                ctx.translate(x, y)
+                ctx.beginPath()
+                ctx.moveTo(0, -size / 2)
+                ctx.bezierCurveTo(
+                    size / 2,
+                    -size * 1.5,
+                    size * 1.5,
+                    -size / 2,
+                    0,
+                    size
+                )
+                ctx.bezierCurveTo(
+                    -size * 1.5,
+                    -size / 2,
+                    -size / 2,
+                    -size * 1.5,
+                    0,
+                    -size / 2
+                )
+                ctx.closePath()
+                ctx.fillStyle = "red"
+                ctx.fill()
+                ctx.restore()
+            }
+
+            // Função para desenhar a flecha
+            function drawFlecha(x, y, angle) {
+                ctx.save()
+                ctx.translate(x, y)
+                ctx.rotate(angle)
+
+                // Corpo da flecha
+                ctx.beginPath()
+                ctx.moveTo(-15, -2)
+                ctx.lineTo(0, -2)
+                ctx.lineTo(0, 2)
+                ctx.lineTo(-15, 2)
+                ctx.closePath()
+                ctx.fillStyle = "brown" // Flecha branca
+                ctx.fill()
+
+                // Ponta da flecha
+                ctx.beginPath()
+                ctx.moveTo(0, -5)
+                ctx.lineTo(5, 0)
+                ctx.lineTo(0, 5)
+                ctx.fillStyle = "white" // Ponta branca
+                ctx.fill()
+
+                ctx.restore()
+            }
+
+            // Função para desenhar o arco
+            function drawBow(x, y, angle, armed) {
+                ctx.save()
+                ctx.translate(x, y)
+                ctx.rotate(angle)
+
+                // Escala do arco para torná-lo menor
+                ctx.scale(0.35, 0.35)
+
+                // Desenhar o arco
+                ctx.beginPath()
+                ctx.arc(0, 0, 60, Math.PI / 2, -Math.PI / 2, true)
+                ctx.lineWidth = 4
+                ctx.strokeStyle = "brown"
+                ctx.stroke()
+
+                // Desenhar a corda
+                ctx.beginPath()
+                ctx.moveTo(0, -60)
+                ctx.lineTo(0, 60)
+                ctx.lineWidth = 2
+                ctx.strokeStyle = "white"
+                ctx.stroke()
+
+                // Se armado, desenhar a flecha no arco
+                if (armed) {
+                    drawFlecha(0, 0, Math.PI / 2) // Flecha apontando para a direita
+                }
+
+                ctx.restore()
+            }
+
+            // Atualizar posição do arco com o mouse e calcular o ângulo em direção ao coração
+            canvas.addEventListener("mousemove", function (e) {
+                var rect = canvas.getBoundingClientRect()
+                bow.x = e.clientX - rect.left
+                bow.y = e.clientY - rect.top
+
+                // Calcular o ângulo em direção ao coração
+                bow.angle = Math.atan2(heart.y - bow.y, heart.x - bow.x)
+            })
+
+            // Eventos de pressionar e soltar o botão do mouse
+            var mouseDown = false
+
+            canvas.addEventListener("mousedown", function (e) {
+                if (!heart.alive) return
+                mouseDown = true
+                bow.armed = true
+            })
+
+            canvas.addEventListener("mouseup", function (e) {
+                if (!heart.alive) return
+                if (mouseDown) {
+                    mouseDown = false
+                    bow.armed = false
+
+                    // Usar o ângulo calculado para o coração
+                    var flecha = {
+                        x: bow.x,
+                        y: bow.y,
+                        speed: 5,
+                        angle: bow.angle,
+                    }
+
+                    flechas.push(flecha)
+                }
+            })
+
+            // Função para iniciar a animação de despedace
+            function startBreakAnimation() {
+                heart.isBreaking = true
+                heart.breakAnimationTime = 0
+                heart.pieces = []
+
+                // Criar peças do coração
+                var numPieces = 20 // Número de pedaços
+                for (var i = 0; i < numPieces; i++) {
+                    var angle = Math.random() * 2 * Math.PI
+                    var speed = 2 + Math.random() * 3
+                    var piece = {
+                        x: heart.x,
+                        y: heart.y,
+                        vx: speed * Math.cos(angle),
+                        vy: speed * Math.sin(angle),
+                        size:
+                            heart.radius / 4 +
+                            Math.random() * (heart.radius / 2),
+                    }
+                    heart.pieces.push(piece)
+                }
+            }
+
+            // Função para desenhar as peças do coração
+            function drawHeartPieces() {
+                heart.breakAnimationTime++
+                for (var i = 0; i < heart.pieces.length; i++) {
+                    var piece = heart.pieces[i]
+                    piece.x += piece.vx
+                    piece.y += piece.vy
+                    piece.vy += 0.1 // Gravidade
+
+                    ctx.save()
+                    ctx.translate(piece.x, piece.y)
+                    ctx.beginPath()
+                    ctx.arc(0, 0, piece.size, 0, 2 * Math.PI)
+                    ctx.fillStyle = "red"
+                    ctx.fill()
+                    ctx.restore()
+                }
+
+                // Se a animação terminou, mostrar a mensagem de vitória
+                if (heart.breakAnimationTime > heart.breakAnimationDuration) {
+                    showVictoryMessage()
+                }
+            }
+
+            // Função para exibir a mensagem de vitória
+            function showVictoryMessage() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height)
+                ctx.font = "50px Arial"
+                ctx.fillStyle = "lightpink" // Mensagem rosa claro
+                ctx.textAlign = "center"
+                ctx.fillText("Amo você 💘", canvas.width / 2, canvas.height / 2)
+            }
+
+            // Função para desenhar a pontuação na tela
+            function drawScore() {
+                ctx.font = "10px Arial"
+                ctx.fillStyle = "white"
+                ctx.textAlign = "left"
+                ctx.fillText("THEYS-HEART: " + (heart.maxHits - score), 10, 30)
+            }
+
+            // Loop do jogo
+            function gameLoop() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+                // Desenhar o fundo preto
+                ctx.fillStyle = "black"
+                ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+                // Desenhar a pontuação
+                drawScore()
+
+                // Desenhar o coração ou as peças do coração
+                if (heart.alive) {
+                    var shakeX = 0
+                    var shakeY = 0
+
+                    if (heart.shakeTime > 0) {
+                        heart.shakeTime--
+                        shakeX = (Math.random() - 0.5) * 10 // Vibração no eixo X
+                        shakeY = (Math.random() - 0.5) * 10 // Vibração no eixo Y
+                    }
+
+                    drawHeart(heart.x + shakeX, heart.y + shakeY, heart.radius)
+                } else if (heart.isBreaking) {
+                    drawHeartPieces()
+                }
+
+                // Desenhar o arco sempre apontando para o coração
+                drawBow(bow.x, bow.y, bow.angle, bow.armed)
+
+                // Atualizar e desenhar as flechas
+                for (var i = 0; i < flechas.length; i++) {
+                    var flecha = flechas[i]
+                    flecha.x += flecha.speed * Math.cos(flecha.angle)
+                    flecha.y += flecha.speed * Math.sin(flecha.angle)
+
+                    drawFlecha(flecha.x, flecha.y, flecha.angle)
+
+                    // Verificar colisão com o coração
+                    var dx = flecha.x - heart.x
+                    var dy = flecha.y - heart.y
+                    var distance = Math.sqrt(dx * dx + dy * dy)
+
+                    if (distance < heart.radius && heart.alive) {
+                        heart.hits++
+                        heart.shakeTime = heart.shakeDuration // Iniciar vibração
+
+                        // Atualizar a pontuação
+                        score++
+
+                        // Adicionar pontuação animada
+                        pontos.push({
+                            x: flecha.x,
+                            y: flecha.y,
+                            text: "-1",
+                            opacity: 1,
+                            vy: -1, // Velocidade vertical para subir
+                        })
+
+                        flechas.splice(i, 1)
+                        i--
+
+                        if (heart.hits >= heart.maxHits) {
+                            heart.alive = false
+                            startBreakAnimation() // Iniciar animação de despedace
+                        }
+                    }
+
+                    // Remover flechas que saíram da tela
+                    else if (
+                        flecha.x < 0 ||
+                        flecha.x > canvas.width ||
+                        flecha.y < 0 ||
+                        flecha.y > canvas.height
+                    ) {
+                        flechas.splice(i, 1)
+                        i--
+                    }
+                }
+
+                // Desenhar e atualizar os pontos animados
+                for (var i = 0; i < pontos.length; i++) {
+                    var ponto = pontos[i]
+                    ponto.y += ponto.vy
+                    ponto.opacity -= 0.02 // Diminuir a opacidade para desaparecer
+
+                    ctx.save()
+                    ctx.globalAlpha = ponto.opacity
+                    ctx.font = "20px Arial"
+                    ctx.fillStyle = "cyan"
+                    ctx.textAlign = "center"
+                    ctx.fillText(ponto.text, ponto.x, ponto.y)
+                    ctx.restore()
+
+                    // Remover o ponto se estiver invisível
+                    if (ponto.opacity <= 0) {
+                        pontos.splice(i, 1)
+                        i--
+                    }
+                }
+
+                // Continuar o loop se a mensagem de vitória ainda não foi exibida
+                if (
+                    !heart.isBreaking ||
+                    heart.breakAnimationTime <= heart.breakAnimationDuration
+                ) {
+                    requestAnimationFrame(gameLoop)
+                }
+            }
+
+            // Iniciar o jogo
+            gameLoop()
+        </script>
+    </body>
+</html>

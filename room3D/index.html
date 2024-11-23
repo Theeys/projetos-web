@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Phong Shading</title>
+    <style>
+        body { margin: 0; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128/examples/js/controls/OrbitControls.js"></script>
+    <script>
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        document.body.appendChild(renderer.domElement);
+
+        // Controles de câmera
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+        // Configuração de refração
+        const refractionProps = {
+            metalness: 0,
+            roughness: 0,
+            transmission: 1,
+            thickness: 0.5,
+            envMapIntensity: 1,
+            reflectivity: 1,
+            ior: 1.5, // Índice de refração
+            clearcoat: 1,
+            clearcoatRoughness: 0
+        }
+
+        // Adicionar luz de ponto
+        const pointLight = new THREE.PointLight(0xffffff, 1, 100);
+        pointLight.position.set(5, 9, 0);
+        pointLight.castShadow = true;
+        scene.add(pointLight);
+
+        // Chão
+        const floorGeometry = new THREE.PlaneGeometry(20, 20);
+        const floorMaterial = new THREE.MeshPhysicalMaterial({ color: 0xC1B3F4 , ...refractionProps});
+        const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+        floor.rotation.x = - Math.PI / 2;
+        floor.receiveShadow = true;
+        scene.add(floor);
+
+        // Paredes
+        const wallMaterial = new THREE.MeshPhongMaterial({ color: 0xFFC0CB});
+
+        const backWallGeometry = new THREE.PlaneGeometry(20, 10);
+        const backWall = new THREE.Mesh(backWallGeometry, wallMaterial);
+        backWall.position.z = -10;
+        backWall.position.y = 5;
+        backWall.receiveShadow = true;
+        scene.add(backWall);
+
+        const leftWallGeometry = new THREE.PlaneGeometry(20, 10);
+        const leftWall = new THREE.Mesh(leftWallGeometry, wallMaterial);
+        leftWall.rotation.y = Math.PI / 2;
+        leftWall.position.x = -10;
+        leftWall.position.y = 5;
+        leftWall.receiveShadow = true;
+        scene.add(leftWall);
+
+        // Cama
+        let bedGeometry = new THREE.BoxGeometry(2.9, 1, 6);
+        let bedMaterial = new THREE.MeshPhongMaterial({ color: 0xFFFFFF });
+        let bed = new THREE.Mesh(bedGeometry, bedMaterial);
+        bed.position.set(-7.5, 0.4, -6.5);
+        bed.receiveShadow = true;
+        bed.castShadow = true
+        scene.add(bed);
+
+        bedGeometry = new THREE.BoxGeometry(3, 1, 5);
+        bedMaterial = new THREE.MeshPhongMaterial({ color: 0xFF69B4 });
+        bed = new THREE.Mesh(bedGeometry, bedMaterial);
+        bed.position.set(-7.5, 0.5, -6.5);
+        bed.receiveShadow = true;
+        bed.castShadow = true
+        scene.add(bed);
+
+        bedGeometry = new THREE.BoxGeometry(1.5, 1, 1);
+        bedMaterial = new THREE.MeshPhongMaterial({ color: 0xF1F1F1 });
+        bed = new THREE.Mesh(bedGeometry, bedMaterial);
+        bed.position.set(-7.5, 0.85, -8.2);
+        bed.receiveShadow = true;
+        bed.castShadow = true
+        scene.add(bed);
+
+        // Mesa central
+        let tableGeometry = new THREE.BoxGeometry(3, 0.2, 2);
+        let tableMaterial = new THREE.MeshPhongMaterial({ color: 0x8B4513 });
+        let table = new THREE.Mesh(tableGeometry, tableMaterial);
+        table.position.set(0, 1.5, -6);
+        table.receiveShadow = true;
+        table.castShadow = true
+        scene.add(table);
+
+        // Mesa coluna
+        tableGeometry = new THREE.BoxGeometry(0.2, 1.5, 0.2);
+        tableMaterial = new THREE.MeshPhongMaterial({ color: 0x8B4513 });
+        table = new THREE.Mesh(tableGeometry, tableMaterial);
+        table.position.set(0, 0.85, -6);
+        table.receiveShadow = true;
+        table.castShadow = true
+        scene.add(table);
+
+        // Mesa apoio da coluna
+        tableGeometry = new THREE.BoxGeometry(0.5, 0.2, 0.5);
+        tableMaterial = new THREE.MeshPhongMaterial({ color: 0x8B4513 });
+        table = new THREE.Mesh(tableGeometry, tableMaterial);
+        table.position.set(0, 0, -6);
+        table.receiveShadow = true
+        table.castShadow = true
+        scene.add(table);
+
+        // Cadeira encosto
+        let chairGeometry = new THREE.BoxGeometry(1, 2, 0.2);
+        let chairMaterial = new THREE.MeshPhongMaterial({ color: 0x36393F });
+        let chair = new THREE.Mesh(chairGeometry, chairMaterial);
+        chair.position.set(0, 2, -3.5);
+        chair.receiveShadow = true;
+        chair.castShadow = true
+        scene.add(chair);
+
+        // Cadeira parte de baixo
+        chairGeometry = new THREE.BoxGeometry(1, 0.2, 1.2);
+        chairMaterial = new THREE.MeshPhongMaterial({ color: 0x36393F });
+        chair = new THREE.Mesh(chairGeometry, chairMaterial);
+        chair.position.set(0, 1, -4);
+        chair.receiveShadow = true;
+        chair.castShadow = true        
+        scene.add(chair);
+
+        // Cadeira apoio da coluna
+        chairGeometry = new THREE.BoxGeometry(0.5, 0.2, 0.5);
+        chairMaterial = new THREE.MeshPhongMaterial({ color: 0x434343 });
+        chair = new THREE.Mesh(chairGeometry, chairMaterial);
+        chair.position.set(0, 0, -4);
+        chair.receiveShadow = true;
+        chair.castShadow = true        
+        scene.add(chair);
+
+        // Cadeira coluna
+        chairGeometry = new THREE.BoxGeometry(0.2, 1, 0.2);
+        chairMaterial = new THREE.MeshPhongMaterial({ color: 0x434343 });
+        chair = new THREE.Mesh(chairGeometry, chairMaterial);
+        chair.position.set(0, 0.5, -4);
+        chair.receiveShadow = true;
+        chair.castShadow = true        
+        scene.add(chair);
+
+        // Guarda-roupa
+        let wardrobeGeometry = new THREE.BoxGeometry(2, 5, 3);
+        let wardrobeMaterial = new THREE.MeshPhongMaterial({ color: 0xF08080 });
+        let wardrobe = new THREE.Mesh(wardrobeGeometry, wardrobeMaterial);
+        wardrobe.position.set(-8, 2.5, 6);
+        wardrobe.receiveShadow = true;
+        wardrobe.castShadow = true
+        scene.add(wardrobe);
+
+        // Guarda-roupa detalhe central
+        wardrobeGeometry = new THREE.BoxGeometry(0.2, 5, 0.1);
+        wardrobeMaterial = new THREE.MeshPhongMaterial({ color: 0x434343 });
+        wardrobe = new THREE.Mesh(wardrobeGeometry, wardrobeMaterial);
+        wardrobe.position.set(-7, 2.5, 6);
+        wardrobe.receiveShadow = true;
+        wardrobe.castShadow = true
+        scene.add(wardrobe);
+
+        // Guarda-roupa detalhe central maçaneta esquerda
+        wardrobeGeometry = new THREE.BoxGeometry(0.2, 0.1, 0.1);
+        wardrobeMaterial = new THREE.MeshPhongMaterial({ color: 0x434343 });
+        wardrobe = new THREE.Mesh(wardrobeGeometry, wardrobeMaterial);
+        wardrobe.position.set(-7, 2.5, 5.6);
+        wardrobe.receiveShadow = true;
+        wardrobe.castShadow = true
+        scene.add(wardrobe);
+
+        // Guarda-roupa detalhe central maçaneta direita
+        wardrobeGeometry = new THREE.BoxGeometry(0.2, 0.1, 0.1);
+        wardrobeMaterial = new THREE.MeshPhongMaterial({ color: 0x434343 });
+        wardrobe = new THREE.Mesh(wardrobeGeometry, wardrobeMaterial);
+        wardrobe.position.set(-7, 2.5, 6.4);
+        wardrobe.receiveShadow = true;
+        wardrobe.castShadow = true
+        scene.add(wardrobe);
+
+        // Luminária (base)
+        let lampGeometry = new THREE.CylinderGeometry(0.008, 0.3, 1.5, 10);
+        let lampMaterial = new THREE.MeshPhongMaterial({ color: 0xffff00 });
+        let lamp = new THREE.Mesh(lampGeometry, lampMaterial);
+        lamp.position.set(1, 2.2, -6); // Ajustar para cima da mesa central
+        lamp.receiveShadow = true;
+        lamp.castShadow = true
+        scene.add(lamp);
+
+        // Abajur (cone)
+        lampGeometry = new THREE.ConeGeometry(0.48, 1, 32);
+        lampMaterial = new THREE.MeshPhongMaterial({ color: 0xd3d3d3 }); // Cinza claro
+        lamp = new THREE.Mesh(lampGeometry, lampMaterial);
+        lamp.position.set(1, 2.9, -6); // Posicionar acima da luminária
+        lamp.receiveShadow = true;
+        lamp.castShadow = true
+        scene.add(lamp);
+
+        // TV
+        let tvGeometry = new THREE.PlaneGeometry(4, 2.7);
+        let tvMaterial = new THREE.MeshPhysicalMaterial({ color: 0x87CEEB , ...refractionProps});
+        let tvObject = new THREE.Mesh(tvGeometry, tvMaterial);
+        tvObject.position.set(0, 4, -9.89);
+        tvObject.receiveShadow = true;
+        tvObject.castShadow = true
+        scene.add(tvObject);
+
+        tvGeometry = new THREE.PlaneGeometry(4.4, 3.1);
+        tvMaterial = new THREE.MeshPhongMaterial({ color: 0x434343 });
+        tvObject = new THREE.Mesh(tvGeometry, tvMaterial);
+        tvObject.position.set(0, 4, -9.9);
+        tvObject.receiveShadow = true;
+        tvObject.castShadow = true
+        scene.add(tvObject);
+
+        // Sofá - Assento
+        let sofaGeometry = new THREE.BoxGeometry(5, 1, 2);
+        let sofaMaterial = new THREE.MeshPhongMaterial({ color: 0xFF1493 });
+        let sofa = new THREE.Mesh(sofaGeometry, sofaMaterial);
+        sofa.position.set(7, 0.8, -8.23);
+        sofa.receiveShadow = true;
+        sofa.castShadow = true
+        scene.add(sofa);
+
+        // Sofá - Encosto
+        sofaGeometry = new THREE.BoxGeometry(5, 2, 0.5);
+        sofaMaterial = new THREE.MeshPhongMaterial({ color: 0xFF1493 });
+        sofa = new THREE.Mesh(sofaGeometry, sofaMaterial);
+        sofa.position.set(7, 1.8, -9);
+        sofa.receiveShadow = true;
+        sofa.castShadow = true
+        scene.add(sofa);
+
+        // Sofá - Encosto lateral esquerdo
+        sofaGeometry = new THREE.BoxGeometry(0.5, 2, 1.5);
+        sofa = new THREE.Mesh(sofaGeometry, sofaMaterial);
+        sofa.position.set(4.7, 1.1, -8);
+        sofa.receiveShadow = true;
+        sofa.castShadow = true
+        scene.add(sofa);
+
+        sofa = new THREE.Mesh(sofaGeometry, sofaMaterial);
+        sofa.position.set(9.3, 1.1, -8);
+        sofa.receiveShadow = true;
+        sofa.castShadow = true
+        scene.add(sofa);        
+
+        // Prateleiras
+        let shelfGeometry = new THREE.BoxGeometry(3, 0.2, 1);
+        let shelfMaterial = new THREE.MeshPhongMaterial({ color: 0xCD5C5C });
+
+        let shelf1 = new THREE.Mesh(shelfGeometry, shelfMaterial);
+        shelf1.position.set(7, 6, -9.6);
+        shelf1.receiveShadow = true;
+        shelf1.castShadow = true
+        scene.add(shelf1);
+
+        let shelf2 = new THREE.Mesh(shelfGeometry, shelfMaterial);
+        shelf2.position.set(7, 5, -9.6);
+        shelf2.receiveShadow = true;
+        shelf2.castShadow = true
+        scene.add(shelf2);
+
+        let shelf3 = new THREE.Mesh(shelfGeometry, shelfMaterial);
+        shelf3.position.set(7, 4, -9.6);
+        shelf3.receiveShadow = true;
+        shelf3.castShadow = true
+        scene.add(shelf3);
+
+        // Enfeites geométricos
+        let sphereGeometry = new THREE.SphereGeometry(0.5, 32, 32);
+        let sphereMaterial = new THREE.MeshPhysicalMaterial({ color: 0x00CED1, ...refractionProps });
+        let sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+        sphere.position.set(7, 6.5, -9.6);
+        sphere.receiveShadow = true;
+        sphere.castShadow = true
+        scene.add(sphere);
+
+        let cubeGeometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
+        let cubeMaterial = new THREE.MeshPhysicalMaterial({ color: 0x9400D3, ...refractionProps });
+        let cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+        cube.position.set(7, 5.36, -9.6);
+        cube.receiveShadow = true;
+        cube.castShadow = true
+        scene.add(cube);
+
+        let coneGeometry = new THREE.ConeGeometry(0.5, 1, 32);
+        let coneMaterial = new THREE.MeshPhysicalMaterial({ color: 0xFF00FF, ...refractionProps });
+        let cone = new THREE.Mesh(coneGeometry, coneMaterial);
+        cone.position.set(7, 4.5, -9.6);
+        cone.receiveShadow = true;
+        cone.castShadow = true
+        scene.add(cone);
+        
+        // Mesinha pequena de biblioteca
+        let smallTableGeometry = new THREE.BoxGeometry(2, 2, 3.5);
+        let smallTableMaterial = new THREE.MeshPhongMaterial({ color: 0xCD5C5C });
+        let smallTable = new THREE.Mesh(smallTableGeometry, smallTableMaterial);
+        smallTable.position.set(-9, 1, 1);
+        smallTable.receiveShadow = true;
+        smallTable.castShadow = true
+        scene.add(smallTable);
+
+        // Livros em cima da mesinha
+        let bookGeometry = new THREE.BoxGeometry(1, 0.4, 1);
+
+        let bookMaterial2 = new THREE.MeshPhongMaterial({ color: 0x4682B4 }); // SteelBlue
+        let book = new THREE.Mesh(bookGeometry, bookMaterial2);
+        book.position.set(-9, 2, 0);
+        book.receiveShadow = true;
+        book.castShadow = true
+        scene.add(book);
+
+        let bookMaterial3 = new THREE.MeshPhongMaterial({ color: 0xFF4500 }); 
+        book = new THREE.Mesh(bookGeometry, bookMaterial3);
+        book.position.set(-9.2, 2, 1.5);
+        book.receiveShadow = true;
+        book.castShadow = true
+        scene.add(book);
+
+
+        // Posição da câmera
+        camera.position.z = 15;
+        camera.position.y = 10;
+
+        // Variável de controle de movimento da luz
+        let lightDirection = 1;
+        const lightSpeed = 0.05;
+        const lightBounds = 9;
+
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            // Mover a luz de ponto
+            pointLight.position.x += lightSpeed * lightDirection;
+            pointLight.position.z += lightSpeed * lightDirection;
+            if (pointLight.position.x > lightBounds || pointLight.position.x < 0) {
+                lightDirection *= -1;
+            }
+
+            controls.update();
+            renderer.render(scene, camera);
+        }
+        
+        animate();
+    </script>
+</body>
+</html>
+

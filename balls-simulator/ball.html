@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    body {
+      background-color: #000;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      width: 100vw;
+    }
+    canvas {
+      background-color: #000;
+      filter: drop-shadow(0 0 10px darkviolet);
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="canvas"></canvas>
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+
+    const percent = 0.8;
+    canvas.width = window.innerWidth * percent;
+    canvas.height = window.innerHeight * percent;
+
+    function draw(ball) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.fillStyle = ball.color;
+      ctx.arc(ball.pos[0], ball.pos[1], ball.size, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    const ball = {
+      pos: [canvas.width / 2, canvas.height / 2],
+      speed: [10, 1],
+      size: 10,
+      color: 'white'
+    }
+
+    draw(ball);
+
+    function animate() {
+      ctx.reset()
+      const limits = [canvas.width, canvas.height];
+      ball.speed[1] += 0.6;
+      for (let i = 0; i < ball.pos.length; i++) {
+        ball.pos[i] += ball.speed[i];
+        if (ball.pos[i] + ball.size > limits[i]) {
+          ball.pos[i] = limits[i] - ball.size;
+          ball.speed[i] = -ball.speed[i];
+        } else if (ball.pos[i] - ball.size < 0) {
+          ball.pos[i] = ball.size;
+          ball.speed[i] = -ball.speed[i];
+        }
+      }
+
+     
+      draw(ball);
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+
+  </script>
+</body>
+</html>
