@@ -44,7 +44,10 @@ handlerResizeWindow()
 const fireHandler = () => {
     const spaceShip = game.getSpaceShips()[0]
     game.createProjetil(spaceShip.pos[0], spaceShip.pos[1])
-    if (game.over) game = new Game(canvas)
+    if (!game.over) return
+    const debug = game.debug
+    game = new Game(canvas)
+    if (debug) game.switchDebug()
 }
 
 btnFullscreen.addEventListener("click", () => {
