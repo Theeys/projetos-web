@@ -1,5 +1,6 @@
 import { Asteroid } from "./asteroid.js"
 import { EntityWithBoxCollision } from "./entity-with-collision.js"
+import { Particle } from "./particle.js"
 
 export class Projetil extends EntityWithBoxCollision {
     constructor(entityProps) {
@@ -40,14 +41,15 @@ export class Projetil extends EntityWithBoxCollision {
             game.entitys = game.entitys.filter(
                 (entity) => entity !== this && entity !== asteroid
             )
-            const smallExplosionSound = new Audio("./assets/audio/8-bit-explode1.mp3")
-            smallExplosionSound.volume = 0.8
-            
-            const bigExplosionSound = new Audio("./assets/audio/8-bit-explode2.mp3")
-            bigExplosionSound.volume = 0.8
 
-            console.log(asteroid.size)
-            asteroid.size > 30 ? bigExplosionSound.play() : smallExplosionSound.play()
+            for (let i = 0; i < 30; i++) {
+                game.entitys.push(new Particle({ pos: [...this.pos] }))
+            }
+
+            const pathAudio = asteroid.size > 30 ? "./assets/audio/8-bit-explode2.mp3" : "./assets/audio/8-bit-explode1.mp3"
+            const explosionSound = new Audio(pathAudio)
+            explosionSound.volume = 0.8
+            explosionSound.play()
         })
     }
 }

@@ -3,6 +3,8 @@ import { Asteroid } from "./entitys/asteroid.js"
 import { Star } from "./entitys/star.js"
 import { Projetil } from "./entitys/projetil.js"
 import { EntityWithBoxCollision } from "./entitys/entity-with-collision.js"
+import { Particle } from "./entitys/particle.js"
+
 export class Game {
     constructor(canvas) {
         this.canvas = canvas
@@ -32,6 +34,10 @@ export class Game {
 
     gameOver() {
         this.start = false
+        const spaceShip = this.getSpaceShips()[0]
+        for (let i = 0; i < 20; i++) {
+            this.entitys.push(new Particle({ pos: [...spaceShip.pos] }))
+        }
         this.entitys = this.entitys.filter(
             (entity) => !(entity instanceof SpaceShip)
         )

@@ -75,6 +75,7 @@ canvas.addEventListener("touchstart", fireHandler)
 
 canvas.addEventListener("touchmove", (e) => {
     const spaceShip = game.getSpaceShips()[0]
+    if (!spaceShip) return
     let x = e.touches[0].clientX
     let y = e.touches[0].clientY
     if (!isFullscreen()) {
@@ -88,6 +89,7 @@ canvas.addEventListener("touchmove", (e) => {
 
 canvas.addEventListener("mousemove", (e) => {
     const spaceShip = game.getSpaceShips()[0]
+    if (!spaceShip) return
     let x = e.clientX
     let y = e.clientY
     if (!isFullscreen()) {
