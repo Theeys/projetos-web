@@ -101,6 +101,7 @@ export class Game {
         return new SpaceShip({
             pos: [x, y],
             color: "teal",
+            debug: this.debug,
         })
     }
 

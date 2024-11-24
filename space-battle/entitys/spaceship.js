@@ -1,7 +1,5 @@
-import { EntityWithBoxCollision } from "./entity-with-collision.js"
 import { Asteroid } from "./asteroid.js"
-import { Projetil } from "./projetil.js"
-import { CollisionUtil } from "../util/collission-util.js"
+import { EntityWithBoxCollision } from "./entity-with-collision.js"
 
 export class SpaceShip extends EntityWithBoxCollision {
     constructor(entityProps) {
