@@ -5,7 +5,6 @@ export class SpaceShip extends EntityWithBoxCollision {
     constructor(entityProps) {
         super(entityProps)
         this.size = entityProps.size ?? [10, 10]
-        this.projetils = []
 
         this.explosionSound = new Audio("./assets/audio/8-bit-explode3.mp3")
         this.explosionSound.volume = 0.8

@@ -42,6 +42,7 @@ window.addEventListener("resize", handlerResizeWindow)
 handlerResizeWindow()
 
 export const fireHandler = () => {
+    console.log(game.entitys)
     const spaceShip = game.getSpaceShips()[0]
     if (spaceShip) {
         game.createProjetil(spaceShip.pos[0], spaceShip.pos[1])

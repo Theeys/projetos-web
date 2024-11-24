@@ -29,7 +29,8 @@ export class Projetil extends EntityWithBoxCollision {
     update(game) {
         super.update(game)
         const onOutLimits = () => {
-            game.entitys = game.entitys.filter((projetil) => projetil !== this)
+            console.log("projetil fora dos limites")
+            game.entitys = game.entitys.filter((entity) => entity !== this)
         }
         this.checkIsOutLimits(onOutLimits)
         const asteroids = game.entitys.filter(

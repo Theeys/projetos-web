@@ -26,16 +26,14 @@ export class EntityWithBoxCollision extends Entity {
     }
 
     updateCollisionBox() {
-        const size = Array.isArray(this.size)
-            ? this.size
-            : [this.size, this.size]
-
         for (let i = 0; i < this.pos.length; i++) {
-            this.boxCollision.pos[i] = this.pos[i] - size[i]
+            const size = Array.isArray(this.size) ? this.size[i] : this.size
+            this.boxCollision.pos[i] = this.pos[i] - size
         }
 
         for (let i = 0; i < this.boxCollision.size.length; i++) {
-            this.boxCollision.size[i] = size[i] * 2
+            const size = Array.isArray(this.size) ? this.size[i] : this.size
+            this.boxCollision.size[i] = size * 2
         }
     }
 

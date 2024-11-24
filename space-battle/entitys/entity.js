@@ -18,11 +18,13 @@ export class Entity {
     }
 
     isAfterMapLimits(limits, i) {
-        return this.pos[i] - this.size > limits[i]
+        const size = Array.isArray(this.size) ? this.size[i] : this.size
+        return this.pos[i] - size > limits[i]
     }
 
     isBeforeMapLimits(i) {
-        return this.pos[i] + this.size < 0
+        const size = Array.isArray(this.size) ? this.size[i] : this.size
+        return this.pos[i] + size < 0
     }
 
     draw(ctx) {}
