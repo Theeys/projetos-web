@@ -42,7 +42,6 @@ window.addEventListener("resize", handlerResizeWindow)
 handlerResizeWindow()
 
 export const fireHandler = () => {
-    console.log(game.entitys)
     const spaceShip = game.getSpaceShips()[0]
     if (spaceShip) {
         game.createProjetil(spaceShip.pos[0], spaceShip.pos[1])
@@ -59,6 +58,18 @@ btnFullscreen.addEventListener("click", () => {
         canvas.webkitRequestFullscreen()
     } else if (canvas.msRequestFullscreen) {
         canvas.msRequestFullscreen()
+    } else {
+        return
+    }
+})
+
+canvas.addEventListener("fullscreenchange", () => {
+    if (!isFullscreen()) {
+        canvas.style.filter = "drop-shadow(0 0 10px darkviolet)"
+        canvas.style.borderRadius = "20px"
+    } else {
+        canvas.style.filter = "none"
+        canvas.style.borderRadius = "0"
     }
 })
 

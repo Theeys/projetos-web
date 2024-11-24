@@ -1,5 +1,4 @@
 import { Entity } from "./entity.js"
-import { canvas, ctx } from "../script.js"
 
 export class Star extends Entity {
     constructor(entityProps) {
@@ -21,7 +20,10 @@ export class Star extends Entity {
         super.update(game)
         const canvas = game.canvas
         const limits = [canvas.width, canvas.height]
-        const onAfterLimits = (i) => (this.pos[i] = 0 + this.size)
+        const onAfterLimits = (i) => {
+            this.pos[i] = 0 + this.size
+            if (i === 1) this.pos[0] = Math.random() * canvas.width
+        }
         const onBeforeLimits = (i) => (this.pos[i] = limits[i] - this.size)
         this.checkIsOutLimits(onAfterLimits, onBeforeLimits)
     }
