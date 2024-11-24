@@ -36,16 +36,12 @@ function isFullscreen() {
     return document.fullscreenElement === canvas
 }
 
-let game = new Game(canvas)
-
-const music = new Audio("./assets/audio/8-bit-loop.mp3")
-music.loop = true
-music.volume = 0.4
+const game = new Game(canvas)
 
 window.addEventListener("resize", handlerResizeWindow)
 handlerResizeWindow()
 
-const fireHandler = () => {
+export const fireHandler = () => {
     const spaceShip = game.getSpaceShips()[0]
     if (spaceShip) {
         game.createProjetil(spaceShip.pos[0], spaceShip.pos[1])
@@ -53,7 +49,6 @@ const fireHandler = () => {
     }
     if (game.start) return
     game.startGame()
-    music.play()
 }
 
 btnFullscreen.addEventListener("click", () => {

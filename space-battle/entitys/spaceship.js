@@ -8,6 +8,9 @@ export class SpaceShip extends EntityWithBoxCollision {
         super(entityProps)
         this.size = entityProps.size ?? [10, 10]
         this.projetils = []
+
+        this.explosionSound = new Audio("./assets/audio/8-bit-explode3.mp3")
+        this.explosionSound.volume = 0.8
     }
 
     updateCollisionBox() {
@@ -65,7 +68,9 @@ export class SpaceShip extends EntityWithBoxCollision {
 
         asteroids.forEach((asteroid) => {
             const isCollided = this.isCollided(asteroid.boxCollision)
-            if (isCollided) game.gameOver()
+            if (!isCollided) return
+            this.explosionSound.play()
+            game.gameOver()
         })
 
         this.spaceShipShape = [

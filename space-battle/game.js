@@ -4,6 +4,7 @@ import { Star } from "./entitys/star.js"
 import { Projetil } from "./entitys/projetil.js"
 import { EntityWithBoxCollision } from "./entitys/entity-with-collision.js"
 import { Particle } from "./entitys/particle.js"
+import { fireHandler } from "./script.js"
 
 export class Game {
     constructor(canvas) {
@@ -11,7 +12,19 @@ export class Game {
         this.ctx = canvas.getContext("2d")
         this.entitys = []
         this.start = false
+        this.over = false
         this.debug = false
+
+        this.music = new Audio("./assets/audio/8-bit-loop.mp3")
+        this.music.loop = true
+        this.music.volume = 0.4
+
+        this.startSound = new Audio("./assets/audio/8-bit-game-start.mp3")
+        this.startSound.volume = 0.8
+
+        this.gameOverSound = new Audio("./assets/audio/8-bit-game-over.mp3")
+        this.gameOverSound.volume = 0.8
+
         for (let i = 0; i < 20; i++) {
             this.entitys.push(
                 this.createStar(
@@ -23,17 +36,24 @@ export class Game {
     }
 
     startGame() {
+        this.startSound.play()
         this.start = true
+        this.over = false
         this.entitys.push(
             this.createSpaceShip(this.canvas.width / 2, this.canvas.height - 10)
         )
         this.entitys = this.entitys.filter(
             (entity) => !(entity instanceof Asteroid)
         )
+        setTimeout(() => {
+            this.music.play()
+        }, 1000)
     }
 
     gameOver() {
+        this.music.pause()
         this.start = false
+        this.over = true
         const spaceShip = this.getSpaceShips()[0]
         for (let i = 0; i < 20; i++) {
             this.entitys.push(new Particle({ pos: [...spaceShip.pos] }))
@@ -41,6 +61,14 @@ export class Game {
         this.entitys = this.entitys.filter(
             (entity) => !(entity instanceof SpaceShip)
         )
+        this.gameOverSound.play()
+        this.canvas.removeEventListener("click", fireHandler)
+        this.canvas.removeEventListener("touchstart", fireHandler)
+
+        setTimeout(() => {
+            this.canvas.addEventListener("click", fireHandler)
+            this.canvas.addEventListener("touchstart", fireHandler)
+        }, 5500)
     }
 
     switchDebug() {
@@ -132,7 +160,7 @@ export class Game {
             this.ctx.font = "bold 50px Arial"
             this.ctx.textAlign = "center"
             this.ctx.fillText(
-                "Iniciar jogo",
+                this.over ? "Game Over" : "Iniciar jogo",
                 this.canvas.width / 2 + bounceOffset,
                 this.canvas.height / 2 + bounceOffset
             )
