@@ -14,6 +14,7 @@ export class Game {
         this.start = false
         this.over = false
         this.debug = false
+        this.score = 0
 
         this.music = new Audio("./assets/audio/8-bit-loop.mp3")
         this.music.loop = true
@@ -39,6 +40,7 @@ export class Game {
         this.startSound.play()
         this.start = true
         this.over = false
+        this.score = 0
         this.entitys.push(
             this.createSpaceShip(this.canvas.width / 2, this.canvas.height - 10)
         )
@@ -144,6 +146,19 @@ export class Game {
         return asteroid
     }
 
+    drawScore(x, y) {
+        this.ctx.save()
+        this.ctx.fillStyle = "white"
+        this.ctx.font = "bold 12px Arial"
+        this.ctx.textAlign = "center"
+        this.ctx.fillText(
+            `Pontuação: ${this.score.toFixed(2).replace(".00", "")}`,
+            x,
+            y
+        )
+        this.ctx.restore()
+    }
+
     updateAndDraw() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
 
@@ -165,19 +180,24 @@ export class Game {
             )
         }
 
-        if (!this.start) {
-            const amplitude = 10
-            const frequency = 0.002
-            const bounceOffset = Math.sin(Date.now() * frequency) * amplitude
-
-            this.ctx.fillStyle = "white"
-            this.ctx.font = "bold 50px Arial"
-            this.ctx.textAlign = "center"
-            this.ctx.fillText(
-                this.over ? "Game Over" : "Iniciar jogo",
-                this.canvas.width / 2 + bounceOffset,
-                this.canvas.height / 2 + bounceOffset
-            )
+        if (this.start) {
+            this.drawScore(50, 20)
+            if (!this.over) this.score = Math.max(0, this.score - 0.1)
+            return
         }
+        const amplitude = 10
+        const frequency = 0.002
+        const bounceOffset = Math.sin(Date.now() * frequency) * amplitude
+        const x = this.canvas.width / 2 + bounceOffset
+        const y = this.canvas.height / 2 + bounceOffset
+
+        this.ctx.save()
+        this.ctx.fillStyle = "white"
+        this.ctx.font = "bold 50px Arial"
+        this.ctx.textAlign = "center"
+        this.ctx.fillText(this.over ? "Game Over" : "Iniciar jogo", x, y)
+        this.ctx.restore()
+        if (!this.over) return
+        this.drawScore(x, y + 25)
     }
 }

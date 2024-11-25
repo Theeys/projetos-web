@@ -40,6 +40,7 @@ export class Projetil extends EntityWithBoxCollision {
             game.entitys = game.entitys.filter(
                 (entity) => entity !== this && entity !== asteroid
             )
+            game.score += asteroid.size
 
             const isBigAsteroid = asteroid.size > 26
 
