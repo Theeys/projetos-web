@@ -3,7 +3,7 @@ import { EntityWithBoxCollision } from "./entity-with-collision.js"
 export class Asteroid extends EntityWithBoxCollision {
     constructor(entityProps) {
         super(entityProps)
-        this.size = 30 * Math.random() + 10
+        this.size = entityProps.size ?? 36
     }
 
     draw(ctx) {

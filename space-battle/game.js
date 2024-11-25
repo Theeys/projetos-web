@@ -116,14 +116,29 @@ export class Game {
         })
     }
 
+    createAsteroidChilds(asteroid) {
+        const amountMax = 3
+        const amountAsteroids = Math.ceil((asteroid.size * amountMax) / 46)
+        const maxSize = Math.ceil(asteroid.size * 0.37)
+        const asteroids = []
+        for (let i = 0; i < amountAsteroids; i++) {
+            const asteroidChild = new Asteroid({
+                pos: [...asteroid.pos],
+                speed: [Math.random() - 0.5, Math.random() * 5 + 2],
+                size: maxSize * Math.random() + 10,
+                color: "white",
+                debug: this.debug,
+            })
+            asteroids.push(asteroidChild)
+        }
+        return asteroids
+    }
+
     createAsteroid(x, y) {
         const asteroid = new Asteroid({
             pos: [x, y],
-            speed: [
-                Math.random() * (Math.random() > 0.5 ? 1 : -1),
-                Math.random() * 5 + 2,
-            ],
-            size: [20, 10],
+            speed: [Math.random() - 0.5, Math.random() * 5 + 2],
+            size: 36 * Math.random() + 10,
             color: "white",
             debug: this.debug,
         })

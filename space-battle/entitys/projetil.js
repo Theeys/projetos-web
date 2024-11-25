@@ -28,10 +28,8 @@ export class Projetil extends EntityWithBoxCollision {
 
     update(game) {
         super.update(game)
-        const onOutLimits = () => {
-            console.log("projetil fora dos limites")
-            game.entitys = game.entitys.filter((entity) => entity !== this)
-        }
+        const onOutLimits = () =>
+            (game.entitys = game.entitys.filter((entity) => entity !== this))
         this.checkIsOutLimits(onOutLimits)
         const asteroids = game.entitys.filter(
             (entity) => entity instanceof Asteroid
@@ -43,14 +41,23 @@ export class Projetil extends EntityWithBoxCollision {
                 (entity) => entity !== this && entity !== asteroid
             )
 
+            const isBigAsteroid = asteroid.size > 26
+
             for (let i = 0; i < 30; i++) {
                 game.entitys.push(new Particle({ pos: [...this.pos] }))
             }
 
-            const pathAudio = asteroid.size > 30 ? "./assets/audio/8-bit-explode2.mp3" : "./assets/audio/8-bit-explode1.mp3"
+            const pathAudio = isBigAsteroid
+                ? "./assets/audio/8-bit-explode2.mp3"
+                : "./assets/audio/8-bit-explode1.mp3"
             const explosionSound = new Audio(pathAudio)
             explosionSound.volume = 0.8
             explosionSound.play()
+
+            if (!isBigAsteroid) return
+
+            const asteroidsChilds = game.createAsteroidChilds(asteroid)
+            game.entitys.push(...asteroidsChilds)
         })
     }
 }
