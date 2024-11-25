@@ -75,9 +75,7 @@ export class Game {
         this.debug = !this.debug
         this.entitys
             .filter((entity) => entity instanceof EntityWithBoxCollision)
-            .forEach((entity) => {
-                entity.boxCollision.show = this.debug
-            })
+            .forEach((entity) => (entity.debug = this.debug))
     }
 
     getSpaceShips() {
@@ -119,7 +117,7 @@ export class Game {
     createAsteroidChilds(asteroid) {
         const amountMax = 3
         const amountAsteroids = Math.ceil((asteroid.size * amountMax) / 46)
-        const maxSize = Math.ceil(asteroid.size * 0.37)
+        const maxSize = asteroid.size * 0.37
         const asteroids = []
         for (let i = 0; i < amountAsteroids; i++) {
             const asteroidChild = new Asteroid({

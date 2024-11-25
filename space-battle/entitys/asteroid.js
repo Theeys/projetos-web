@@ -35,6 +35,15 @@ export class Asteroid extends EntityWithBoxCollision {
         ctx.stroke()
 
         ctx.restore()
+
+        if (!this.debug) return
+
+        ctx.save()
+        ctx.fillStyle = "cyan"
+        ctx.font = "10px Arial"
+        ctx.textAlign = "center"
+        ctx.fillText(this.size.toFixed(2), this.pos[0], this.pos[1])
+        ctx.restore()
     }
 
     update(game) {

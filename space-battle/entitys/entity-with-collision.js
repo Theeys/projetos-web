@@ -6,13 +6,12 @@ export class EntityWithBoxCollision extends Entity {
         this.boxCollision = {
             pos: [this.pos[0] - this.size, this.pos[1] - this.size],
             size: [this.size, this.size],
-            show: entityProps.debug?? false,
         }
     }
 
     draw(ctx) {
         super.draw(ctx)
-        if (!this.boxCollision.show) return
+        if (!this.debug) return
         ctx.save()
         ctx.strokeStyle = "red"
         ctx.lineWidth = 2

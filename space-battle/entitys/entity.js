@@ -3,6 +3,7 @@ export class Entity {
         this.pos = entityProps.pos ?? [0, 0]
         this.speed = entityProps.speed ?? [0, 0]
         this.color = entityProps.color ?? "white"
+        this.debug = entityProps.debug ?? false
     }
 
     checkIsOutLimits(onAfterLimits, onBeforeLimits) {
