@@ -1,5 +1,6 @@
 import { Star } from "./entitys/star.js"
 import { Game } from "./game.js"
+import { PlataformUtil } from "./util/plataform-util.js"
 
 const canvas = document.getElementById("canvas")
 const ctx = canvas.getContext("2d")
@@ -52,14 +53,19 @@ export const fireHandler = () => {
 }
 
 btnFullscreen.addEventListener("click", () => {
-    if (canvas.requestFullscreen) {
+    if (PlataformUtil.isIOSDevice()) {
+        canvas.width = window.innerWidth
+        canvas.height = window.innerHeight
+        canvas.style.filter = "none"
+        canvas.style.borderRadius = "0"
+        document.body.innerHTML = ""
+        document.body.appendChild(canvas)
+    } else if (canvas.requestFullscreen) {
         canvas.requestFullscreen()
     } else if (canvas.webkitRequestFullscreen) {
         canvas.webkitRequestFullscreen()
     } else if (canvas.msRequestFullscreen) {
         canvas.msRequestFullscreen()
-    } else {
-        return
     }
 })
 
