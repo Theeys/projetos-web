@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>sandbox</title>
+        <style>
+            body {
+                background: black;
+                height: 100vh;
+                width: 100vw;
+                margin: 0;
+                display: flex;
+                flex-direction: column;
+                gap: 40px;
+                justify-content: center;
+                align-items: center;
+            }
+            canvas {
+                background: black;
+                filter: drop-shadow(0 0 10px darkviolet);
+                border-radius: 20px;
+            }
+            button {
+                background-color: purple;
+                filter: drop-shadow(0 0 10px darkviolet);
+                border-radius: 20px;
+                color: white;
+                padding: 5px 20px;
+                border: none;
+                margin: 0 20px;
+            }
+            textarea {
+                /* display: none; */
+                background-color: black;
+                color: white;
+                width: 50%;
+                min-width: 300px;
+                height: 150px;
+            }
+        </style>
+    </head>
+    <body>
+        <canvas></canvas>
+        <textarea id="inputParams"></textarea>
+        <div>
+            <button id="btnGenerate">Gerar bolas</button>
+            <button id="btnCustom">Customizar</button>
+        </div>
+        <script>
+
+            class Ball {
+                constructor(props) {
+                    props = props ?? {}
+                    this.size = props.size ?? 10
+                    this.color = props.color ?? "white"
+                    this.speed = props.speed ?? [0, 0]
+                    this.coord = props.coord ?? [100, 100]
+                    this.gravity = props.gravity ?? 0.8
+                    this.bounce = props.bounce ?? 0.6
+                }
+
+                draw() {
+                    ctx.save()
+                    ctx.beginPath()
+                    ctx.fillStyle = this.color
+                    ctx.arc(this.coord[0], this.coord[1], this.size, 0, 2 * Math.PI)
+                    ctx.fill()
+                    ctx.restore()
+                }
+
+                update() {
+                    const limits = [canvas.width - this.size, canvas.height - this.size]
+
+                    this.speed[1] += this.gravity
+
+                    for (let i = 0; i < this.coord.length; i++) {
+                        this.coord[i] += this.speed[i]
+                        if (this.coord[i] > limits[i]) {
+                            this.coord[i] = limits[i]
+                            this.speed[i] *= -this.bounce
+                        } else if (this.coord[i] < this.size) {
+                            this.coord[i] = this.size
+                            this.speed[i] *= -this.bounce
+                        }
+                    }
+
+                    if (this.coord[1] >= limits[1]) this.speed[1] *= this.bounce
+
+                    entitys
+                        .filter((entity) => entity !== this)
+                        .forEach((entity) => {
+                            const dx = entity.coord[0] - this.coord[0]
+                            const dy = entity.coord[1] - this.coord[1]
+                            const distance = Math.sqrt(dx * dx + dy * dy)
+                            const sum = entity.size + this.size
+                            if (distance > sum) return
+                            const angle = Math.atan2(dy, dx)
+                            const speed1 = this.speed[0]//Math.sqrt(this.speed[0] ** 2 + this.speed[1] ** 2)
+                            const speed2 = entity.speed[0]//Math.sqrt(entity.speed[0] ** 2 + entity.speed[1] ** 2)
+
+                            const newSpeed1 = speed1 * this.bounce
+                            const newSpeed2 = speed2 * entity.bounce
+
+                            this.speed[0] = -speed1 * Math.cos(angle)
+                            this.speed[1] = -speed1 * Math.sin(angle)
+                            entity.speed[0] = speed2 * Math.cos(angle)
+                            entity.speed[1] = speed2 * Math.sin(angle)
+                            this.resolveOverlap(this, entity)
+                        })
+                }
+
+                resolveOverlap = (ball1, ball2) => {
+                    const dx = ball2.coord[0] - ball1.coord[0]
+                    const dy = ball2.coord[1] - ball1.coord[1]
+                    const distance = Math.sqrt(dx * dx + dy * dy)
+                    const overlap = ball1.size + ball2.size - distance
+                    if (overlap > 0) {
+                        const angle = Math.atan2(dy, dx)
+                        const offsetX = Math.cos(angle) * overlap / 2
+                        const offsetY = Math.sin(angle) * overlap / 2
+                        ball1.coord[0] -= offsetX
+                        ball1.coord[1] -= offsetY
+                        ball2.coord[0] += offsetX
+                        ball2.coord[1] += offsetY
+                    }                
+                }
+            }
+
+            const canvas = document.querySelector("canvas")
+            const ctx = canvas.getContext("2d")
+            const btnGenerate = document.querySelector("#btnGenerate")
+            const btnCustom = document.querySelector("#btnCustom")
+            const textarea = document.querySelector("#inputParams")
+
+            const percent = 0.6
+            canvas.width = window.innerWidth * percent
+            canvas.height = window.innerHeight * percent
+
+            const entitys = []
+            const randomColor = () => {
+                var letters = "0123456789ABCDEF"
+                var color = "#"
+                for (var i = 0; i < 6; i++) {
+                    color += letters[Math.floor(Math.random() * 16)]
+                }
+                return color
+            }
+
+            const isValidColor = (color) => {
+                const tempCanvas = document.createElement('canvas')
+                const context = tempCanvas.getContext('2d')
+                context.fillStyle = color
+                return context.fillStyle !== '#000000'
+            }            
+
+            let defaultProps = { speed: [8, 5], size: 5, bounce: 0.8, gravity: 0.8, color: 'random'}
+
+            textarea.value = JSON.stringify(defaultProps, null, 4)
+            textarea.addEventListener('input', (event) => {
+                try {
+                    defaultProps = JSON.parse(textarea.value)
+                } catch (error) {}
+            })
+            btnGenerate.addEventListener('click', () => {
+                const rawParams = JSON.stringify(defaultProps)
+                for (let i = 0; i < 30; i++) {
+                    const params = JSON.parse(rawParams)
+                    params.color = isValidColor(params.color)? params.color : randomColor()
+                    entitys.push(new Ball(params))
+                }
+            })
+            btnCustom.addEventListener('click' , () => {
+                const display = textarea.style.display
+                textarea.style.display = !display || display == "none"? "inline-block" : "none"
+            })
+
+            const animation = () => {
+                entitys.forEach((entity) => entity.update())
+                ctx.reset()
+                entitys.forEach((entity) => entity.draw())
+                requestAnimationFrame(animation)
+            }
+            animation()
+        </script>
+    </body>
+</html>
